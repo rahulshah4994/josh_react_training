@@ -1,9 +1,9 @@
 import "./App.css"
-import { Login } from "./views/Login"
-import { Users } from "./views/Users"
+import { Login } from "./views/login"
+import { UsersList } from "./views/users/list"
 import { Link, Route, Routes } from "react-router-dom"
-import { UserDetails } from "./views/UserDetails"
-import { UsersContainer } from "./components/UsersContainer"
+import { UserDetails } from "./views/users/details"
+import { Users } from "./views/users"
 
 function App() {
 	return (
@@ -22,10 +22,10 @@ function App() {
 						<Routes>
 							<Route path="/" element={<h1>HOME</h1>} />
 							<Route path="/login" element={<Login />} />
-							<Route path="/users" element={<UsersContainer />}>
-								<Route path="*" element={<Users title="Regular Users" />} />
-								<Route path="/users/regular" element={<Users title="Regular Users" />} />
-								<Route path="/users/premium" element={<Users title="Premium Users" />} />
+							<Route path="/users" element={<Users />}>
+								<Route path="" element={<UsersList title="Regular Users" />} />
+								<Route path="/users/regular" element={<UsersList title="Regular Users" />} />
+								<Route path="/users/premium" element={<UsersList title="Premium Users" />} />
 								<Route path="/users/details/:userId" element={<UserDetails />} />
 							</Route>
 						</Routes>

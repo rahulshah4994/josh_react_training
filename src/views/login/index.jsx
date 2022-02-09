@@ -1,4 +1,5 @@
 import { useReducer } from "react"
+import { useNavigate } from "react-router-dom"
 import * as yup from "yup"
 
 const initialState = { email: "", password: "", emailError: "", passwordError: "" }
@@ -29,9 +30,10 @@ const reducer = (state, action) => {
 	}
 }
 
-export function Login({ onLoginSuccess }) {
+export function Login() {
+	const navigate = useNavigate()
 	const [state, dispatch] = useReducer(reducer, initialState)
-	const { email, password } = state
+	const { email, password, emailError, passwordError } = state
 
 	const setEmail = (payload) => {
 		dispatch({ type: constants.SET_EMAIL, payload })
@@ -41,31 +43,38 @@ export function Login({ onLoginSuccess }) {
 		dispatch({ type: constants.SET_PASSWORD, payload })
 	}
 
-	// const setEmailError = (payload) => {
-	// 	dispatch({ type: constants.SET_EMAIL_ERROR, payload })
-	// }
+	const setEmailError = (payload) => {
+		dispatch({ type: constants.SET_EMAIL_ERROR, payload })
+	}
 
-	// const setPasswordError = (payload) => {
-	// 	dispatch({ type: constants.SET_PASSWORD_ERROR, payload })
-	// }
+	const setPasswordError = (payload) => {
+		dispatch({ type: constants.SET_PASSWORD_ERROR, payload })
+	}
 
 	const validationSchema = yup.object().shape({
 		email: yup.string().email().required(),
 		password: yup.string().min(8).required(),
 	})
 
-	const handleValidationErrors = (validationError) => {}
+	const handleValidationErrors = (validationError) => {
+		setEmailError("")
+		setPasswordError("")
+		validationError.inner.forEach((err) => {
+			if (err.path === "email") {
+				setEmailError(err.errors[0])
+			}
+			if (err.path === "password") {
+				setPasswordError(err.errors[0])
+			}
+		})
+	}
 
 	const onLoginSubmit = (e) => {
 		e.preventDefault()
-		//Validate schema using yup
 		validationSchema
 			.validate({ email, password }, { abortEarly: false })
-			.then(() => onLoginSuccess())
 			.catch((err) => handleValidationErrors(err))
-		//If invalid, handle errors
-		//If valid, call Login success
-		// onLoginSuccess()
+			.then(() => navigate("/users"))
 	}
 
 	return (
@@ -76,12 +85,14 @@ export function Login({ onLoginSuccess }) {
 				<button type="button" onClick={() => setEmail("")}>
 					&times;
 				</button>
+				{emailError && <div style={{ fontSize: 10, color: "red" }}>{emailError}</div>}
 			</div>
 			<div>
 				<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
 				<button type="button" onClick={() => setPassword("")}>
 					&times;
 				</button>
+				{passwordError && <div style={{ fontSize: 10, color: "red" }}>{passwordError}</div>}
 			</div>
 			<div>
 				<button type="submit">Submit</button>
